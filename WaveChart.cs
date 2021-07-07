@@ -41,10 +41,10 @@ namespace AudioEditor
 		private int   gTmShowPosY;
 		
 		
-		const float       gWavMin= -1.0f;
-		const float       gWavMax= 1.0f;
-		List<float> gWavDataBuf= new List<float>();
-		Pen         gWavePen = new Pen(Color.Yellow,1.0f);
+		const float    gWavMin= -1.0f;
+		const float    gWavMax= 1.0f;
+		List<float>    gWavDataBuf= new List<float>();
+		Pen            gWavePen = new Pen(Color.Yellow,1.0f);
 		
 		public WaveChart() {
 			InitializeComponent();
@@ -109,6 +109,7 @@ namespace AudioEditor
 					Invoke((MethodInvoker)delegate(){
 					       	gDataBar.Maximum=gWavDataBuf.Count;
 					       	gDataBar.Value=gStIndex;
+					       	ShowInfo();
 					       	//gDataBar.SmallChange=(int)(0.5f*gWavDataBuf.Count/(gWavDataBuf[gWavDataBuf.Count-1]));
 					       	//gDataBar.LargeChange=(int)(0.5f*gWavDataBuf.Count/(gWavDataBuf[gWavDataBuf.Count-1]));
 					       });
@@ -119,7 +120,14 @@ namespace AudioEditor
 				
 			}
 			get{
-				return gWavDataBuf.ToArray();
+				if(gViewStIndex==-1 ||  gViewEndIndex==-1){
+					return gWavDataBuf.ToArray();
+				}
+				else{
+					int st = Math.Min(gViewStIndex, gViewEndIndex);
+					int cnt = Math.Abs(gViewStIndex-gViewEndIndex);
+					return gWavDataBuf.GetRange(st,cnt).ToArray();
+				}
 			}
 		}
 		
@@ -134,7 +142,7 @@ namespace AudioEditor
 			float result =0;
 			result=(val-gWavMin);
 			result = result * _height/ (gWavMax-gWavMin);
-			result = (_height - result+3);
+			result = (_height - result);
 			return result;
 		}
 
@@ -212,7 +220,7 @@ namespace AudioEditor
 			int    tmOffx =0;
 			float  xx;
 			
-			string stm=(gStIndex*1.0/SamplingRate).ToString("0.0");
+			string stm=(gStIndex*1000/SamplingRate).ToString("0");
 			
 			PointF[] previousPoint=new PointF[1];
 			PointF[] currentPoint=new PointF[1];
@@ -235,7 +243,7 @@ namespace AudioEditor
 				
 				if(tmposIndx<gcntXblok && (int)previousPoint[0].X>=gTmShosPosX[tmposIndx])
 				{
-					stm=(1.0*i/SamplingRate).ToString("0.0");
+					stm=(1000*i/SamplingRate).ToString("0");
 					tmOffx=(int)g.MeasureString(stm,this.Font).Width;
 					g.DrawString(stm,Font,this.strTm,gTmShosPosX[tmposIndx]-tmOffx+5,gTmShowPosY);
 					tmposIndx++;
@@ -275,16 +283,18 @@ namespace AudioEditor
 			}
 			
 			gTmShosPosX[gcntXblok-1]-=2;
-			
-			g.DrawLine(xOq,0,sty,_width,sty); //X Oqini Sizidu
-			
 			inc=(gWavMax-gWavMin)/10.0f;
 			curval=gWavMin;
 			for(int i=0;i<10;i++)
 			{
-				curval+=inc;
 				ypos=CalcVerticalPosition(curval);
-				g.DrawLine(katek,0,ypos,_width,ypos);
+				if(i==0){
+					g.DrawLine(xOq,0,ypos,_width,ypos); //X Oqini Sizidu
+				}
+				else{
+					g.DrawLine(katek,0,ypos,_width,ypos);
+				}
+				curval+=inc;
 			}
 		}
 		
@@ -327,12 +337,16 @@ namespace AudioEditor
 		{
 			needPrecal=true;
 			gAudioPanel.Location=new Point(0,0);
-			gAudioPanel.Size=new Size(this.Size.Width,this.Size.Height-this.gDataBar.Height);
+			gAudioPanel.Size=new Size(this.Size.Width,this.Size.Height-this.gDataBar.Height-this.labSt.Height);
 			gAudioPanel.Visible=true;
 
 			gDataBar.Left=gAudioPanel.Left;
 			gDataBar.Top=gAudioPanel.Bottom;
 			gDataBar.Width=gAudioPanel.Size.Width;
+
+			labSt.Location = new Point(0, gDataBar.Bottom);
+			labSt.Width = gAudioPanel.Size.Width;
+			
 			_height=gAudioPanel.Height-(Font.Height+10);
 			_width=gAudioPanel.Width-5;
 		}
@@ -394,8 +408,6 @@ namespace AudioEditor
 					deltaSt=Math.Abs(index-gViewStIndex);
 					deltaEnd=Math.Abs(index-gViewEndIndex);
 					
-//					System.Diagnostics.Debug.WriteLine("index =" + index+ "  St ="+gViewStIndex+ " End= "+ gViewEndIndex);
-					
 					if(deltaSt<(6/Zoom))
 					{
 						gAudioPanel.Cursor=System.Windows.Forms.Cursors.VSplit;
@@ -412,6 +424,7 @@ namespace AudioEditor
 						gStEnd=-1;
 					}
 				}
+				ShowInfo();
 			}
 		}
 		
@@ -438,15 +451,15 @@ namespace AudioEditor
 					if(gViewStIndex==gWavDataBuf.Count-1)
 					{
 						gViewEndIndex=gViewStIndex;
-						gViewStIndex=gViewStIndex-(int)(20.0/Zoom);
+						gViewStIndex=gViewStIndex-(int)(1000.0*SamplingRate/1000.0);
 						if(gViewStIndex<0){
-							gViewStIndex=1;
+							gViewStIndex=0;
 						}
 					}
 					else
 					{
-						gViewEndIndex=gViewStIndex+(int)(20.0/Zoom);
-						if(gViewEndIndex>gWavDataBuf.Count-1)
+						gViewEndIndex=gViewStIndex+(int)(1000.0*SamplingRate/1000.0);
+						if(gViewEndIndex>=gWavDataBuf.Count)
 						{
 							gViewEndIndex=gWavDataBuf.Count-1;
 						}
@@ -500,6 +513,7 @@ namespace AudioEditor
 					}
 				}
 			}
+			ShowInfo();
 		}
 
 		void LineChartMouseWheel(object sender, MouseEventArgs e)
@@ -558,6 +572,17 @@ namespace AudioEditor
 			gViewEndIndex=-1;
 			needPrecal=true;
 			gAudioPanel.Invalidate();
+		}
+		
+		void ShowInfo(){
+			if(gViewStIndex==-1 ||  gViewEndIndex==-1){
+				labSt.Text = string.Format("Sampling rate:{0}, Length: {1} ms",SamplingRate, (int)(gWavDataBuf.Count*1000.0/SamplingRate));
+			}
+			else{
+				int st = Math.Min(gViewStIndex, gViewEndIndex);
+				int cnt = Math.Abs(gViewStIndex-gViewEndIndex);
+				labSt.Text = string.Format("Sampling rate:{0}, Length: {1} ms, Selection Started: {2} ms, Selection Length: {3} ms",SamplingRate, (int)(gWavDataBuf.Count*1000.0/SamplingRate), (int)(st*1000.0/SamplingRate), (int)(cnt*1000.0/SamplingRate));
+			}
 		}
 	}
 }
