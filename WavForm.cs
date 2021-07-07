@@ -38,6 +38,7 @@ namespace AudioEditor
 		
 		void WavFormShown(object sender, EventArgs e)
 		{
+			WavFormSizeChanged(null,null);
 			wavChart.Init();
 			DiscreteSignal left;
 			if(gFileName==null){
@@ -136,6 +137,15 @@ namespace AudioEditor
 				var waveFile = new WaveFile(wav);
 				waveFile.SaveTo(stream);
 			}
+		}
+
+		void WavFormSizeChanged(object sender, EventArgs e)
+		{
+			int ww = this.ClientSize.Width-6;
+			toolStrip1.Location = new Point(3,0);
+			toolStrip1.Width = ww;
+			wavChart.Location = new Point(3,toolStrip1.Bottom);
+			wavChart.Size = new Size(ww,this.ClientSize.Height-(toolStrip1.Height-3));
 		}
 	}
 }

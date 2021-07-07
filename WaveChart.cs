@@ -142,7 +142,7 @@ namespace AudioEditor
 			float result =0;
 			result=(val-gWavMin);
 			result = result * _height/ (gWavMax-gWavMin);
-			result = (_height - result);
+			result = (_height - result+3);
 			return result;
 		}
 
@@ -281,20 +281,19 @@ namespace AudioEditor
 				g.DrawLine(xOq,endx,sty,endx,sty-3); //X Oqining Rezmisini sizidu
 				gTmShosPosX[i]=(int)endx;
 			}
-			
 			gTmShosPosX[gcntXblok-1]-=2;
+			g.DrawLine(xOq,0,sty,_width,sty); //X Oqini Sizidu
+			
 			inc=(gWavMax-gWavMin)/10.0f;
 			curval=gWavMin;
 			for(int i=0;i<10;i++)
 			{
-				ypos=CalcVerticalPosition(curval);
-				if(i==0){
-					g.DrawLine(xOq,0,ypos,_width,ypos); //X Oqini Sizidu
-				}
-				else{
-					g.DrawLine(katek,0,ypos,_width,ypos);
-				}
 				curval+=inc;
+				ypos=CalcVerticalPosition(curval);
+				if(i==9){
+					System.Diagnostics.Debug.WriteLine(ypos +" " + curval);
+				}
+				g.DrawLine(katek,0,ypos,_width,ypos);
 			}
 		}
 		
@@ -337,8 +336,7 @@ namespace AudioEditor
 		{
 			needPrecal=true;
 			gAudioPanel.Location=new Point(0,0);
-			gAudioPanel.Size=new Size(this.Size.Width,this.Size.Height-this.gDataBar.Height-this.labSt.Height);
-			gAudioPanel.Visible=true;
+			gAudioPanel.Size=new Size(this.Size.Width,this.Size.Height-(this.gDataBar.Height+this.labSt.Height));
 
 			gDataBar.Left=gAudioPanel.Left;
 			gDataBar.Top=gAudioPanel.Bottom;

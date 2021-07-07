@@ -66,22 +66,21 @@ namespace AudioEditor
 			// 
 			// wavChart
 			// 
-			this.wavChart.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-			| System.Windows.Forms.AnchorStyles.Left) 
-			| System.Windows.Forms.AnchorStyles.Right)));
+			this.wavChart.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.wavChart.Audio = new float[0];
 			this.wavChart.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
 			this.wavChart.ChartBackground = System.Drawing.Color.DarkBlue;
-			this.wavChart.Location = new System.Drawing.Point(2, 1);
+			this.wavChart.Location = new System.Drawing.Point(0, 33);
 			this.wavChart.Name = "wavChart";
 			this.wavChart.SamplingRate = 22050;
-			this.wavChart.Size = new System.Drawing.Size(661, 328);
+			this.wavChart.Size = new System.Drawing.Size(772, 410);
 			this.wavChart.TabIndex = 0;
 			this.wavChart.Zoom = 1F;
 			// 
 			// toolStrip1
 			// 
 			this.toolStrip1.AutoSize = false;
+			this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
 			this.toolStrip1.GripMargin = new System.Windows.Forms.Padding(0);
 			this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
 			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -99,7 +98,7 @@ namespace AudioEditor
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Padding = new System.Windows.Forms.Padding(0);
 			this.toolStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.toolStrip1.Size = new System.Drawing.Size(666, 32);
+			this.toolStrip1.Size = new System.Drawing.Size(772, 32);
 			this.toolStrip1.TabIndex = 27;
 			this.toolStrip1.Text = "toolStrip1";
 			// 
@@ -206,12 +205,13 @@ namespace AudioEditor
 			this.AllowDrop = true;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-			this.ClientSize = new System.Drawing.Size(666, 332);
+			this.ClientSize = new System.Drawing.Size(772, 455);
 			this.Controls.Add(this.toolStrip1);
 			this.Controls.Add(this.wavChart);
 			this.Name = "WavForm";
 			this.Text = "Simple Audio Editor";
 			this.Shown += new System.EventHandler(this.WavFormShown);
+			this.SizeChanged += new System.EventHandler(this.WavFormSizeChanged);
 			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.WavFormDragDrop);
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.WavFormDragEnter);
 			this.Paint += new System.Windows.Forms.PaintEventHandler(this.WavFormPaint);
